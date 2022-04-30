@@ -1,2 +1,7 @@
 README.MD
 .env
+node_module
+/node_modules
+uploads/*.jpg
+uploads/*.png
+frontend/main.js

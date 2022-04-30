@@ -60,24 +60,45 @@ export const createProduct = async () => {
 };
 export const updateProduct = async (product) => {
   try {
-    const {token} = getUserInfo();
+    const { token } = getUserInfo();
     const response = await axios({
       url: `${apiUrl}/api/products/${product._id}`,
       method: 'PUT',
       headers: {
-        'Content-Type':'application/json',
+        'Content-Type': 'application/json',
         Authorization: `Bearer ${token}`,
       },
       data: product,
     });
-    if (response.statusText !== 'Ok ') {
+    if (response.statusText !== 'OK') {
       throw new Error(response.data.message);
     }
     return response.data;
   } catch (err) {
-    return { error: err.response.data.message || err.message};
+    return { error: err.response.data.message || err.message };
   }
 };
+export const uploadProductImage = async (formData) => {
+  try {
+    const { token } = getUserInfo();
+    const response = await axios({
+      url: `${apiUrl}/api/uploads`,
+      method: 'POST',
+      headers: {
+          Authorization: `Bearer ${token}`,
+          'Content-Type': 'multipart/form-data',
+        },
+        data: formData,
+    });
+    if (response.statusText !== 'Created') {
+      throw new Error(response.data.message);
+    } else {
+      return response.data;
+    }
+  } catch (err) {
+    return { error: err.response.data.message || err.message};
+  }
+}
 export const signin = async ({email, password}) => {
   try {
     const response = await axios ({
