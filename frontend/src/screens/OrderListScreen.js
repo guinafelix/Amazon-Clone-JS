@@ -1,0 +1,78 @@
+/* eslint-disable no-restricted-globals */
+/* eslint-disable no-alert */
+import { getOrders, deleteOrder } from "../api";
+import DashboardMenu from "../components/DashboardMenu";
+import { showLoading, hideLoading, rerender, showMessage} from '../utils';
+
+const OrderListScreen = {
+    after_render: () => {
+        const deleteButtons = document.getElementsByClassName('delete-button');
+        Array.from(deleteButtons).forEach((deleteButton) => {
+            deleteButton.addEventListener('click', async () => {
+                if (confirm('Tem certeza que deseja excluir esta ordem?')) {
+                    showLoading();
+                    const data = await deleteOrder(deleteButton.id);
+                    if (data.error) {
+                        showMessage(data.error);
+                    }else {
+                        rerender(OrderListScreen);
+                    }
+                    hideLoading();
+                }
+            })
+        });
+        const editButtons = document.getElementsByClassName('edit-button');
+        Array.from(editButtons).forEach((editButton) => {
+            editButton.addEventListener('click', async () => {
+                document.location.hash = `/order/${editButton.id}`
+            })
+        });
+    },
+    render: async () => {
+        const orders = await getOrders();
+        return `
+        <div class="dashboard">
+            ${DashboardMenu.render({ selected: 'orders' })}
+            <div class="dashboard-content">
+                <h1>Pedidos</h1>
+                <div class="order-list">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>DATA</th>
+                                <th>TOTAL</th>
+                                <th>USUÁRIO</th>
+                                <th>PAGO EM</th>
+                                <th>ENTREGUE EM</th>
+                                <th class="tr-action">AÇÃO</th>
+                            <tr>
+                        </thead>
+                        <tbody>
+                            ${orders
+                                .map(
+                                    (order) => `
+                            <tr>
+                                <td>${order._id}</td>
+                                <td>${order.createdAt}</td>
+                                <td>${order.totalPrice}</td>
+                                <td>${order.user.name}</td>
+                                <td>${order.paidAt || 'não'}</td>
+                                <td>${order.deliveredAt || 'não'}</td>
+                                <td>
+                                  <button id="${order._id}" class="edit-button">Edit</button>
+                                  <button id="${order._id}" class="delete-button">Delete</button>
+                                </td>
+                            </tr>
+                            `
+                            )
+                            .join('\n')}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+        `
+    }
+};
+export default OrderListScreen;

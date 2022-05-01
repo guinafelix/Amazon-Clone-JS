@@ -1,4 +1,5 @@
-import { getOrder, getPaypalClientId, payOrder } from '../api';
+import { deliverOrder, getOrder, getPaypalClientId, payOrder } from '../api';
+import { getUserInfo } from '../localStorage';
 import {hideLoading, parseRequestUrl, rerender, showLoading, showMessage} from '../utils';
 
 const handlePayment = (clientId, totalPrice) => {
@@ -63,8 +64,18 @@ const addPaypalSdk = async (totalPrice) => {
     }
 };
 const OrderScreen = {
-    after_render: async () => {},
+    after_render: async () => {
+        const request = parseRequestUrl();
+        document.getElementById('deliver-order-button').addEventListener('click', async() => {
+            showLoading();
+            await deliverOrder(request.id);
+            hideLoading();
+            showMessage('Pedido Entregue.');
+            rerender(OrderScreen);
+        })
+    },
     render: async () => {
+        const {isAdmin} = getUserInfo();
         const request = parseRequestUrl();
         const {
             _id,
@@ -146,6 +157,12 @@ const OrderScreen = {
                                 <li class="total"><div>Total</div><div>$${totalPrice}</div></li>
                                 <li>
                                     <div class="fw" id="paypal-button"></div>
+                                </li>
+                                <li>
+                                ${
+                                    isPaid && !isDelivered && isAdmin ? 
+                                    `<button id="deliver-order-button" class="primary fw">Entregar pedido</button>` : ''
+                                }    
                                 </li>
                             </li>
                         </ul>

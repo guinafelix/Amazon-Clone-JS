@@ -67,5 +67,5 @@ productRouter.delete(
         res.status(404).send({ message: 'Product Not Found' });
       }
     })
-  );
+);
 export default productRouter;
