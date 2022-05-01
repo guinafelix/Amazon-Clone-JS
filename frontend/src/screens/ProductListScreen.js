@@ -1,5 +1,8 @@
-import { createProduct, getProducts } from "../api";
+/* eslint-disable no-restricted-globals */
+/* eslint-disable no-alert */
+import { createProduct, getProducts, deleteProduct } from "../api";
 import DashboardMenu from "../components/DashboardMenu";
+import { showLoading, hideLoading, rerender, showMessage} from '../utils';
 
 const ProductListScreen = {
     after_render: () => {
@@ -11,6 +14,21 @@ const ProductListScreen = {
         Array.from(editButtons).forEach((editButton) => {
             editButton.addEventListener('click', () => {
                 document.location.hash = `/product/${editButton.id}/edit`;
+            });
+        });
+        const deleteButtons = document.getElementsByClassName('delete-button');
+        Array.from(deleteButtons).forEach((deleteButton) => {
+            deleteButton.addEventListener('click', async () => {
+                if (confirm('Tem certeza que deseja excluir este produto?')) {
+                    showLoading();
+                    const data = await deleteProduct(deleteButton.id);
+                    if (data.error) {
+                        showMessage(data.error);
+                    }else {
+                        rerender(ProductListScreen);
+                    }
+                    hideLoading();
+                }
             })
         })
     },
@@ -40,19 +58,20 @@ const ProductListScreen = {
                             ${products
                                 .map(
                                     (product) => `
-                                        <tr>
-                                            <td>${product._id}</td>
-                                            <td>${product.name}</td>
-                                            <td>${product.price}</td>
-                                            <td>${product.category}</td>
-                                            <td>${product.brand}</td>
-                                            <td>
-                                                <button id="${product._id}" class="edit-button">Editar</button>
-                                                <button id="${product._id}" class="delete-button">Excluir</button>
-                                            </td>
-                                        </tr>
-                                        `
-                                ).join('\n')}
+                            <tr>
+                                <td>${product._id}</td>
+                                <td>${product.name}</td>
+                                <td>${product.price}</td>
+                                <td>${product.category}</td>
+                                <td>${product.brand}</td>
+                                <td>
+                                  <button id="${product._id}" class="edit-button">Edit</button>
+                                  <button id="${product._id}" class="delete-button">Delete</button>
+                                </td>
+                            </tr>
+                            `
+                            )
+                            .join('\n')}
                         </tbody>
                     </table>
                 </div>
