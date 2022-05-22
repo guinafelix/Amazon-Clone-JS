@@ -7,7 +7,8 @@
     "start": "babel-node backend/server.js",
     "build": "rd /s /q  dist && babel backend -d dist && cd frontend && npm install && npm run build",
     "serve": "node dist/server.js",
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "heroku-prebuild":"cd frontend && npm install --dev",
+    "heroku-postbuild":"npm run build && cd frontend && npm install && npm run build"
   },
   "author": "",
   "license": "ISC",
@@ -33,5 +34,9 @@
     "eslint-plugin-import": "^2.25.4",
     "install": "^0.13.0",
     "nodemon": "^2.0.4"
+  },
+  "engines": {
+    "node": "12.4.0",
+    "npm":"6.9.0"
   }
 }
