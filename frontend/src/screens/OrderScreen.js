@@ -66,13 +66,15 @@ const addPaypalSdk = async (totalPrice) => {
 const OrderScreen = {
     after_render: async () => {
         const request = parseRequestUrl();
-        document.getElementById('deliver-order-button').addEventListener('click', async() => {
-            showLoading();
-            await deliverOrder(request.id);
-            hideLoading();
-            showMessage('Pedido Entregue.');
-            rerender(OrderScreen);
-        })
+         if (document.getElementById("deliver-order-button")) {
+           document.addEventListener("click", async () => {
+             showLoading();
+             await deliverOrder(request.id);
+             hideLoading();
+             showMessage("Order Delivered.");
+             rerender(OrderScreen);
+           });
+         }
     },
     render: async () => {
         const {isAdmin} = getUserInfo();
